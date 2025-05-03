@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <string.h>
+
+// Function to simulate the DFA
+int isAccepted(char *str) {
+    int state = 0; // Start state
+    int i = 0;
+
+    // If the string is empty, reject
+    if (str[0] == '\0') return 0;
+
+    // Check if the first character is 'a'
+    if (str[0] != 'a') {
+        return 0; // Not starting with 'a'
+    }
+
+    // Traverse the string character by character
+    while (str[i] != '\0') {
+        char ch = str[i];
+
+        // Accept only 'a' or 'b'
+        if (ch != 'a' && ch != 'b') {
+            return 0; // Invalid character
+        }
+
+        i++;
+    }
+
+    // Check if the last character is 'a'
+    if (str[i - 1] != 'a') {
+        return 0; // Does not end with 'a'
+    }
+
+    return 1; // String is accepted
+}
+
+int main() {
+    char input[100];
+
+    printf("Enter a string (only 'a' and 'b'): ");
+    scanf("%s", input);
+
+    if (isAccepted(input)) {
+        printf("The string is accepted by the DFA.\n");
+    } else {
+        printf("The string is rejected by the DFA.\n");
+    }
+
+    return 0;
+}
