@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
+#define MAX_STATES 10
+
+// States: 0 (start), 1 (seen 0), 2 (seen 01 - accept)
+int transition[3][2][MAX_STATES]; // state, input(0/1), possible next states
+int num_transitions[3][2]; // number of transitions for each state and input
+
+bool is_final_state(int state) {
+    return state == 2;
+}
+
+bool simulate_nfa(int current_state, char *input, int pos) {
+    if (input[pos] == '\0') {
+        return is_final_state(current_state);
+    }
+
+    int symbol = input[pos] - '0';
+    int num_next = num_transitions[current_state][symbol];
+
+    for (int i = 0; i < num_next; i++) {
+        int next_state = transition[current_state][symbol][i];
+        if (simulate_nfa(next_state, input, pos + 1)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+int main() {
+    // Define transitions
+    // From state 0
+    num_transitions[0][0] = 2;
+    transition[0][0][0] = 0;  // Loop to self on 0
+    transition[0][0][1] = 1;  // Go to state 1 on 0
+
+    num_transitions[0][1] = 1;
+    transition[0][1][0] = 0;  // Loop to self on 1
+
+    // From state 1
+    num_transitions[1][0] = 1;
+    transition[1][0][0] = 1;  // Loop on 0
+
+    num_transitions[1][1] = 1;
+    transition[1][1][0] = 2;  // Go to accept state on 1 (i.e., 01 detected)
+
+    // State 2 (accept) has no transitions (final state)
+    num_transitions[2][0] = 0;
+    num_transitions[2][1] = 0;
+
+    char input[100];
+    printf("Enter a binary string: ");
+    scanf("%s", input);
+
+    if (simulate_nfa(0, input, 0)) {
+        printf("Accepted by NFA.\n");
+    } else {
+        printf("Rejected by NFA.\n");
+    }
+
+    return 0;
+}
