@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
+// Recursive function to check if the string belongs to the language
+bool isValidCFG(char str[], int start, int end) {
+    // A → ε (empty string is valid)
+    if (start > end)
+        return true;
+
+    // S → A → sequence of 1s
+    bool allOnes = true;
+    for (int i = start; i <= end; i++) {
+        if (str[i] != '1') {
+            allOnes = false;
+            break;
+        }
+    }
+    if (allOnes)
+        return true;
+
+    // Check for pattern: 0 S 0
+    if (str[start] == '0' && str[end] == '0') {
+        return isValidCFG(str, start + 1, end - 1);
+    }
+
+    return false;
+}
+
+int main() {
+    char input[100];
+
+    printf("Enter a binary string (0s and 1s): ");
+    scanf("%s", input);
+
+    int length = strlen(input);
+
+    if (isValidCFG(input, 0, length - 1)) {
+        printf("The string belongs to the language defined by the CFG.\n");
+    } else {
+        printf("The string does NOT belong to the language defined by the CFG.\n");
+    }
+
+    return 0;
+}
