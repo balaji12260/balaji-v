@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
+// Function to check if the string is accepted by the NFA
+bool simulateNFA(const char *str) {
+    int len = strlen(str);
+
+    // String must be at least 2 characters to have a beginning and end
+    if (len < 2) return false;
+
+    // NFA accepts if the string starts with 'b' and ends with 'a'
+    if (str[0] == 'b' && str[len - 1] == 'a') {
+        return true;
+    }
+    return false;
+}
+
+int main() {
+    char input[100];
+
+    printf("Enter a string over the alphabet {a, b}: ");
+    scanf("%s", input);
+
+    if (simulateNFA(input)) {
+        printf("The string is accepted by the NFA (starts with 'b' and ends with 'a').\n");
+    } else {
+        printf("The string is NOT accepted by the NFA.\n");
+    }
+
+    return 0;
+}
