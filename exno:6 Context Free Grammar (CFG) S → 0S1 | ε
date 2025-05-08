@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
+// Function to check if the string matches the CFG: S → 0S1 | ε
+bool isValidCFG(const char *str, int start, int end) {
+    // Base case: empty string (ε) is valid
+    if (start > end)
+        return true;
+
+    // Check for the pattern 0...1
+    if (str[start] == '0' && str[end] == '1')
+        return isValidCFG(str, start + 1, end - 1);
+
+    // If it doesn't match the pattern, it's invalid
+    return false;
+}
+
+int main() {
+    char input[100];
+
+    printf("Enter a string of 0s and 1s: ");
+    scanf("%s", input);
+
+    int length = strlen(input);
+
+    if (isValidCFG(input, 0, length - 1))
+        printf("The string belongs to the language defined by the CFG.\n");
+    else
+        printf("The string does NOT belong to the language defined by the CFG.\n");
+
+    return 0;
+}
