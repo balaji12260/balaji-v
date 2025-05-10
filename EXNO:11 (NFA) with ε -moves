@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_STATES 20
+#define MAX_SYMBOLS 20
+
+// Structure to represent a node in the adjacency list
+struct Node {
+    int state;
+    struct Node* next;
+};
+
+// Adjacency list for transitions: transition[state][symbol] points to a list of destination states
+struct Node* transition[MAX_STATES][MAX_SYMBOLS];
+
+// Array to store the input symbols
+char symbols[MAX_SYMBOLS];
+int num_states, num_symbols;
+
+// Function to add a transition from 'from_state' to 'to_state' on 'symbol'
+void add_transition(int from_state, char symbol, int to_state) {
+    int symbol_index = -1;
+    for (int i = 0; i < num_symbols; i++) {
+        if (symbols[i] == symbol) {
+            symbol_index = i;
+            break;
+        }
+    }
+    if (symbol_index == -1) {
+        printf("Invalid symbol: %c\n", symbol);
+        exit(1);
+    }
+
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->state = to_state;
+    new_node->next = transition[from_state][symbol_index];
+    transition[from_state][symbol_index] = new_node;
+}
+
+// Recursive function to find ε-closure of a state
+void epsilon_closure(int state, int* closure, int* visited) {
+    if (visited[state])
+        return;
+    visited[state] = 1;
+    closure[state] = 1;
+
+    int epsilon_index = -1;
+    for (int i = 0; i < num_symbols; i++) {
+        if (symbols[i] == 'e') {
+            epsilon_index = i;
+            break;
+        }
+    }
+    if (epsilon_index == -1)
+        return;
+
+    struct Node* ptr = transition[state][epsilon_index];
+    while (ptr != NULL) {
+        epsilon_closure(ptr->state, closure, visited);
+        ptr = ptr->next;
+    }
+}
+
+int main() {
+    int num_transitions;
+    printf("Enter the number of states: ");
+    scanf("%d", &num_states);
+    printf("Enter the number of input symbols (including 'e' for epsilon): ");
+    scanf("%d", &num_symbols);
+    printf("Enter the input symbols:\n");
+    for (int i = 0; i < num_symbols; i++) {
+        scanf(" %c", &symbols[i]);
+    }
+
+    // Initialize transition table
+    for (int i = 0; i < num_states; i++) {
+        for (int j = 0; j < num_symbols; j++) {
+            transition[i][j] = NULL;
+        }
+    }
+
+    printf("Enter the number of transitions: ");
+    scanf("%d", &num_transitions);
+    printf("Enter transitions in the format: from_state symbol to_state\n");
+    for (int i = 0; i < num_transitions; i++) {
+        int from_state, to_state;
+        char symbol;
+        scanf("%d %c %d", &from_state, &symbol, &to_state);
+        add_transition(from_state, symbol, to_state);
+    }
+
+    // Compute ε-closure for each state
+    for (int i = 0; i < num_states; i++) {
+        int closure[MAX_STATES] = {0};
+        int visited[MAX_STATES] = {0};
+        epsilon_closure(i, closure, visited);
+        printf("ε-closure(q%d): { ", i);
+        for (int j = 0; j < num_states; j++) {
+            if (closure[j])
+                printf("q%d ", j);
+        }
+        printf("}\n");
+    }
+
+    return 0;
+}
