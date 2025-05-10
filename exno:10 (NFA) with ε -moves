@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MAX_STATES 100
+
+int n; // Number of states
+int epsilon[MAX_STATES][MAX_STATES]; // Adjacency matrix for ε-transitions
+bool visited[MAX_STATES]; // Visited array for DFS
+bool closure[MAX_STATES][MAX_STATES]; // ε-closure for each state
+
+// Depth-First Search to compute ε-closure
+void dfs(int start, int current) {
+    if (visited[current]) return;
+    visited[current] = true;
+    closure[start][current] = true;
+    for (int next = 0; next < n; next++) {
+        if (epsilon[current][next]) {
+            dfs(start, next);
+        }
+    }
+}
+
+int main() {
+    printf("Enter the number of states: ");
+    scanf("%d", &n);
+
+    // Initialize epsilon transitions
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            epsilon[i][j] = 0;
+        }
+    }
+
+    int num_transitions;
+    printf("Enter the number of ε-transitions: ");
+    scanf("%d", &num_transitions);
+
+    printf("Enter the ε-transitions (from_state to_state):\n");
+    for (int i = 0; i < num_transitions; i++) {
+        int from, to;
+        scanf("%d %d", &from, &to);
+        epsilon[from][to] = 1;
+    }
+
+    // Compute ε-closure for each state
+    for (int i = 0; i < n; i++) {
+        // Reset visited array
+        for (int j = 0; j < n; j++) {
+            visited[j] = false;
+        }
+        dfs(i, i);
+    }
+
+    // Display ε-closures
+    printf("\nε-closures:\n");
+    for (int i = 0; i < n; i++) {
+        printf("ε-closure(%d): { ", i);
+        for (int j = 0; j < n; j++) {
+            if (closure[i][j]) {
+                printf("%d ", j);
+            }
+        }
+        printf("}\n");
+    }
+
+    return 0;
+}
